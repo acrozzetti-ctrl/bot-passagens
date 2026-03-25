@@ -1,23 +1,31 @@
-import random
+import requests
 
 ROTAS = [
-    ("GRU", "JFK", "13/12/2026", 3500),
-    ("JFK", "MIA", "22/12/2026", 800),
-    ("MIA", "GRU", "10/01/2027", 3500)
+    ("GRU", "JFK", "2026-12-13", 3500),
+    ("JFK", "MIA", "2026-12-22", 800),
+    ("MIA", "GRU", "2027-01-10", 3500)
 ]
 
-def buscar_precos():
+def buscar_preco(origem, destino, data):
+    url = f"https://www.skyscanner.com.br/transport/flights/{origem}/{destino}/{data}/"
+    
+    print(f"\n🔍 {origem} → {destino} | {data}")
+    print(f"🌐 Ver direto: {url}")
+    
+    # valor simulado mais realista
+    preco_estimado = 3000
+    
+    return preco_estimado
+
+def monitorar():
     for origem, destino, data, limite in ROTAS:
-        print(f"\n🔍 {origem} → {destino} | {data}")
+        preco = buscar_preco(origem, destino, data)
         
-        # simulação de preço (vamos trocar depois por real)
-        preco = random.randint(2000, 5000)
-        
-        print(f"💰 Preço: R$ {preco}")
+        print(f"💰 Estimativa: R$ {preco}")
         
         if preco < limite:
-            print("🔥 PROMOÇÃO ENCONTRADA!")
+            print("🔥 PROMOÇÃO!")
         else:
             print("❌ Ainda caro")
 
-buscar_precos()
+monitorar()
