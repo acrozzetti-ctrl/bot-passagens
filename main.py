@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 
 EMAIL_REMETENTE = "acrozzetti@gmail.com"
 EMAIL_SENHA = "Ann@2411"
-EMAIL_DESTINO = "SEUEMAIL@gmail.com"
+EMAIL_DESTINO = "acrozzetti@gmail.com"
 
 def enviar_email(msg):
     corpo = MIMEText(msg)
