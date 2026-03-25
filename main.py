@@ -3,7 +3,7 @@ import time
 from email.mime.text import MIMEText
 
 EMAIL_REMETENTE = "acrozzetti@gmail.com"
-EMAIL_SENHA = "Ann@2411"
+EMAIL_SENHA = "409575"
 EMAIL_DESTINO = "acrozzetti@gmail.com"
 
 def enviar_email(msg):
