@@ -1,5 +1,7 @@
 import json
 import requests
+import base64
+import os
 
 ROTAS = [
     ("GRU", "JFK", "2026-12-11", 3500),
@@ -12,25 +14,43 @@ ROTAS = [
     ("MIA", "GRU", "2027-01-11", 3500)
 ]
 
+REPO = os.getenv("GITHUB_REPOSITORY")
+TOKEN = os.getenv("GITHUB_TOKEN")
 ARQUIVO = "precos.json"
 
-def carregar_precos():
-    try:
-        with open(ARQUIVO, "r") as f:
-            return json.load(f)
-    except:
-        return {}
+def pegar_arquivo():
+    url = f"https://api.github.com/repos/{REPO}/contents/{ARQUIVO}"
+    headers = {"Authorization": f"token {TOKEN}"}
 
-def salvar_precos(dados):
-    with open(ARQUIVO, "w") as f:
-        json.dump(dados, f)
+    r = requests.get(url, headers=headers)
+
+    if r.status_code == 200:
+        conteudo = r.json()
+        dados = base64.b64decode(conteudo["content"]).decode()
+        return json.loads(dados), conteudo["sha"]
+    
+    return {}, None
+
+def salvar_arquivo(dados, sha):
+    url = f"https://api.github.com/repos/{REPO}/contents/{ARQUIVO}"
+    headers = {"Authorization": f"token {TOKEN}"}
+
+    conteudo = base64.b64encode(json.dumps(dados, indent=2).encode()).decode()
+
+    body = {
+        "message": "Atualizando preços automaticamente",
+        "content": conteudo,
+        "sha": sha
+    }
+
+    requests.put(url, headers=headers, json=body)
 
 def buscar_preco_fake():
     import random
     return random.randint(2000, 5000)
 
 def monitorar():
-    historico = carregar_precos()
+    historico, sha = pegar_arquivo()
     novos_dados = {}
 
     for origem, destino, data, limite in ROTAS:
@@ -53,6 +73,6 @@ def monitorar():
 
         novos_dados[chave] = preco
 
-    salvar_precos(novos_dados)
+    salvar_arquivo(novos_dados, sha)
 
 monitorar()
