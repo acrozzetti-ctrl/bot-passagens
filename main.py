@@ -1,14 +1,12 @@
 import json
-import os
+import requests
 
 ROTAS = [
     ("GRU", "JFK", "2026-12-11", 3500),
     ("GRU", "JFK", "2026-12-12", 3500),
     ("GRU", "JFK", "2026-12-13", 3500),
     ("GRU", "JFK", "2026-12-14", 3500),
-
     ("JFK", "MIA", "2026-12-22", 800),
-
     ("MIA", "GRU", "2027-01-09", 3500),
     ("MIA", "GRU", "2027-01-10", 3500),
     ("MIA", "GRU", "2027-01-11", 3500)
@@ -17,10 +15,11 @@ ROTAS = [
 ARQUIVO = "precos.json"
 
 def carregar_precos():
-    if os.path.exists(ARQUIVO):
+    try:
         with open(ARQUIVO, "r") as f:
             return json.load(f)
-    return {}
+    except:
+        return {}
 
 def salvar_precos(dados):
     with open(ARQUIVO, "w") as f:
