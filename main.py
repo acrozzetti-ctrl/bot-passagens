@@ -2,8 +2,8 @@ import smtplib
 import time
 from email.mime.text import MIMEText
 
-EMAIL_REMETENTE = "SEUEMAIL@gmail.com"
-EMAIL_SENHA = "SENHA_DE_APP"
+EMAIL_REMETENTE = "acrozzetti@gmail.com"
+EMAIL_SENHA = "Ann@2411"
 EMAIL_DESTINO = "SEUEMAIL@gmail.com"
 
 def enviar_email(msg):
