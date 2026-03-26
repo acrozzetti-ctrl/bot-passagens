@@ -25,27 +25,34 @@
 
 <h1>✈️ Monitor de Passagens</h1>
 
-<div id="voos"></div>
+<div id="voos">Carregando...</div>
 
 <script>
 fetch("https://acrozzetti-ctrl.github.io/bot-passagens/precos.json")
-.then(r => r.json())
+.then(response => response.json())
 .then(data => {
-    let html = "";
+    const container = document.getElementById("voos");
+    container.innerHTML = "";
 
-    for (let rota in data) {
-        let preco = data[rota];
+    for (const rota in data) {
+        const preco = data[rota];
 
-        html += `
-        <div class="card">
+        const div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
             <h2>${rota}</h2>
             <p>💰 R$ ${preco}</p>
             ${preco < 3000 ? "<p class='promo'>🔥 PROMOÇÃO</p>" : ""}
-        </div>`;
-    }
+        `;
 
-    document.getElementById("voos").innerHTML = html;
-});  
+        container.appendChild(div);
+    }
+})
+.catch(error => {
+    document.getElementById("voos").innerHTML = "❌ Erro ao carregar dados";
+    console.error(error);
+});
 </script>
 
 </body>
