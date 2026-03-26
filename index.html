@@ -6,6 +6,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <link rel="manifest" href="manifest.json">
+
   <style>
     body {
       font-family: Arial;
@@ -56,6 +58,14 @@
       border: 2px solid #22c55e;
       transform: scale(1.05);
     }
+
+    button {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -69,8 +79,8 @@
 
 <div id="dados"></div>
 
-<h2>📊 Gráfico de preços</h2>
-<canvas id="grafico" width="400" height="200"></canvas>
+<h2>📊 Evolução dos preços</h2>
+<canvas id="grafico"></canvas>
 
 <script>
 fetch("precos.json")
@@ -80,25 +90,17 @@ fetch("precos.json")
     const alerta = document.getElementById("alerta");
 
     let temPromocao = false;
-
-    const labels = [];
-    const valores = [];
+    const datasets = [];
 
     for (let rota in data) {
-      const historico = data[rota];
-      const preco = Array.isArray(historico)
-        ? historico[historico.length - 1]
-        : historico;
-
-      labels.push(rota);
-      valores.push(preco);
+      const historico = Array.isArray(data[rota]) ? data[rota] : [data[rota]];
+      const preco = historico[historico.length - 1];
 
       let limite = 3000;
       if (rota.includes("MIA-GRU")) limite = 3200;
       if (rota.includes("JFK-MIA")) limite = 800;
 
       const barato = preco <= limite;
-
       if (barato) temPromocao = true;
 
       container.innerHTML += `
@@ -107,11 +109,20 @@ fetch("precos.json")
           <div class="preco ${barato ? "barato" : "caro"}">
             R$ ${preco}
           </div>
-          <div>
-            ${barato ? "🔥 PROMOÇÃO!" : "😬 Ainda caro"}
-          </div>
+          <div>${barato ? "🔥 PROMOÇÃO!" : "😬 Ainda caro"}</div>
+
+          <a href="https://www.google.com/travel/flights?q=${rota}" target="_blank">
+            <button>🔎 Ver voo real</button>
+          </a>
         </div>
       `;
+
+      datasets.push({
+        label: rota,
+        data: historico,
+        fill: false,
+        tension: 0.3
+      });
     }
 
     if (temPromocao) {
@@ -119,16 +130,13 @@ fetch("precos.json")
       alert("🔥 TEM PROMOÇÃO! Corre ver!");
     }
 
-    const ctx = document.getElementById('grafico').getContext('2d');
+    const ctx = document.getElementById("grafico").getContext("2d");
 
     new Chart(ctx, {
-      type: 'bar',
+      type: "line",
       data: {
-        labels: labels,
-        datasets: [{
-          label: 'Preço (R$)',
-          data: valores
-        }]
+        labels: [...Array(20).keys()],
+        datasets: datasets
       }
     });
   });
