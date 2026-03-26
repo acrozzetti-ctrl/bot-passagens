@@ -19,3 +19,4 @@ def salvar_arquivo(dados, sha):
     
     print("STATUS SALVAR:", r.status_code)
     print(r.text)
+monitorar()
