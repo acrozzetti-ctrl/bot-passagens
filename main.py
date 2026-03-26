@@ -65,10 +65,16 @@ def monitorar():
         
         preco = buscar_preco_realista(origem, destino)
 
-        if chave not in historico:
-            historico[chave] = []
+       # se não existir, cria lista
+if chave not in historico:
+    historico[chave] = []
 
-        historico[chave].append(preco)
+# se for número antigo, transforma em lista
+if isinstance(historico[chave], int):
+    historico[chave] = [historico[chave]]
+
+# agora adiciona normalmente
+historico[chave].append(preco)
 
         print(f"\n🔍 {origem} → {destino} | {data}")
         print(f"💰 Atual: R$ {preco}")
