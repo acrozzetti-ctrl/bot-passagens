@@ -34,7 +34,7 @@
       background: #1e293b;
       margin: 20px auto;
       padding: 20px;
-      width: 330px;
+      width: 340px;
       border-radius: 15px;
       box-shadow: 0 0 15px rgba(0,0,0,0.6);
     }
@@ -63,16 +63,19 @@
       transform: scale(1.05);
     }
 
-    button {
-      margin-top: 10px;
-      padding: 10px;
+    .botoes button {
+      margin: 5px;
+      padding: 8px;
       border-radius: 8px;
       border: none;
       cursor: pointer;
-      background: #22c55e;
-      color: black;
       font-weight: bold;
     }
+
+    .latam { background: #00bcd4; color: black; }
+    .aa { background: #0078d2; color: white; }
+    .delta { background: #e11d48; color: white; }
+
   </style>
 </head>
 
@@ -121,10 +124,9 @@ fetch("precos.json")
       const barato = preco <= limite;
       if (barato) temPromocao = true;
 
-      const link = `https://www.google.com/travel/flights?hl=pt-BR&curr=BRL&oneWay=true&q=${origem}+to+${destino}+${dataVoo}`;
-
       container.innerHTML += `
         <div class="card ${barato ? "promo-card" : ""}">
+
           <h3>${mapaAeroportos[origem]} → ${mapaAeroportos[destino]}</h3>
 
           <div class="preco ${barato ? "barato" : "caro"}">
@@ -132,14 +134,29 @@ fetch("precos.json")
           </div>
 
           <div class="menor">
-            💸 Menor preço: R$ ${menorPreco}
+            💸 Menor preço histórico: R$ ${menorPreco}
           </div>
 
           <div>${barato ? "🔥 PROMOÇÃO!" : "😬 Ainda caro"}</div>
 
-          <a href="${link}" target="_blank">
-            <button>✈️ Ver voo (só ida)</button>
-          </a>
+          <div class="botoes">
+            <a href="https://www.latamairlines.com/br/pt" target="_blank">
+              <button class="latam">LATAM</button>
+            </a>
+
+            <a href="https://www.aa.com/homePage.do" target="_blank">
+              <button class="aa">American</button>
+            </a>
+
+            <a href="https://www.delta.com/" target="_blank">
+              <button class="delta">Delta</button>
+            </a>
+          </div>
+
+          <div style="font-size:13px; margin-top:8px; color:#94a3b8;">
+            📋 Copie: ${origem} → ${destino} | ${dataVoo}
+          </div>
+
         </div>
       `;
 
@@ -166,18 +183,12 @@ fetch("precos.json")
       options: {
         plugins: {
           legend: {
-            labels: {
-              color: "white"
-            }
+            labels: { color: "white" }
           }
         },
         scales: {
-          x: {
-            ticks: { color: "white" }
-          },
-          y: {
-            ticks: { color: "white" }
-          }
+          x: { ticks: { color: "white" } },
+          y: { ticks: { color: "white" } }
         }
       }
     });
