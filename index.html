@@ -1,58 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>✈️ Monitor de Passagens</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #0f172a;
-            color: white;
-            text-align: center;
-        }
-        .card {
-            background: #1e293b;
-            margin: 20px;
-            padding: 20px;
-            border-radius: 15px;
-        }
-        .promo {
-            color: #22c55e;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Monitor de Passagens ✈️</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 40px;
+      font-size: 32px;
+    }
+
+    .card {
+      background: #1e293b;
+      margin: 20px auto;
+      padding: 20px;
+      width: 300px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .preco {
+      font-size: 28px;
+      margin: 10px 0;
+    }
+
+    .barato {
+      color: #22c55e;
+      font-weight: bold;
+    }
+
+    .caro {
+      color: #ef4444;
+    }
+  </style>
 </head>
+
 <body>
 
 <h1>✈️ Monitor de Passagens</h1>
 
-<div id="voos">Carregando...</div>
+<div id="dados"></div>
 
 <script>
-fetch("https://acrozzetti-ctrl.github.io/bot-passagens/precos.json")
-.then(response => response.json())
-.then(data => {
-    const container = document.getElementById("voos");
-    container.innerHTML = "";
+fetch("precos.json")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("dados");
 
-    for (const rota in data) {
-        const preco = data[rota];
+    for (let rota in data) {
+      const preco = data[rota];
 
-        const div = document.createElement("div");
-        div.className = "card";
+      let limite = 3000;
+      if (rota.includes("MIA-GRU")) limite = 3200;
+      if (rota.includes("JFK-MIA")) limite = 800;
 
-        div.innerHTML = `
-            <h2>${rota}</h2>
-            <p>💰 R$ ${preco}</p>
-            ${preco < 3000 ? "<p class='promo'>🔥 PROMOÇÃO</p>" : ""}
-        `;
+      const barato = preco <= limite;
 
-        container.appendChild(div);
+      container.innerHTML += `
+        <div class="card">
+          <h3>${rota}</h3>
+          <div class="preco ${barato ? "barato" : "caro"}">
+            R$ ${preco}
+          </div>
+          <div>
+            ${barato ? "🔥 PROMOÇÃO!" : "😬 Ainda caro"}
+          </div>
+        </div>
+      `;
     }
-})
-.catch(error => {
-    document.getElementById("voos").innerHTML = "❌ Erro ao carregar dados";
-    console.error(error);
-});
+  });
 </script>
 
 </body>
