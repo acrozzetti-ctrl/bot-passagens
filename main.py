@@ -14,6 +14,7 @@ REPO = os.getenv("GITHUB_REPOSITORY")
 TOKEN = os.getenv("GITHUB_TOKEN")
 ARQUIVO = "precos.json"
 
+
 def pegar_arquivo():
     url = f"https://api.github.com/repos/{REPO}/contents/{ARQUIVO}"
     headers = {"Authorization": f"token {TOKEN}"}
@@ -24,8 +25,9 @@ def pegar_arquivo():
         conteudo = r.json()
         dados = base64.b64decode(conteudo["content"]).decode()
         return json.loads(dados), conteudo["sha"]
-    
+
     return {}, None
+
 
 def salvar_arquivo(dados, sha):
     url = f"https://api.github.com/repos/{REPO}/contents/{ARQUIVO}"
@@ -45,6 +47,7 @@ def salvar_arquivo(dados, sha):
 
     print("STATUS SALVAR:", r.status_code)
 
+
 def buscar_preco_realista(origem, destino):
     base = {
         ("GRU", "JFK"): 3200,
@@ -57,24 +60,23 @@ def buscar_preco_realista(origem, destino):
 
     return max(500, preco_base + variacao)
 
+
 def monitorar():
     historico, sha = pegar_arquivo()
 
     for origem, destino, data, limite in ROTAS:
         chave = f"{origem}-{destino}-{data}"
-        
+
         preco = buscar_preco_realista(origem, destino)
 
-       # se não existir, cria lista
-if chave not in historico:
-    historico[chave] = []
+        # garante lista
+        if chave not in historico:
+            historico[chave] = []
 
-# se for número antigo, transforma em lista
-if isinstance(historico[chave], int):
-    historico[chave] = [historico[chave]]
+        if isinstance(historico[chave], int):
+            historico[chave] = [historico[chave]]
 
-# agora adiciona normalmente
-historico[chave].append(preco)
+        historico[chave].append(preco)
 
         print(f"\n🔍 {origem} → {destino} | {data}")
         print(f"💰 Atual: R$ {preco}")
@@ -83,5 +85,6 @@ historico[chave].append(preco)
             print("🔥 PROMOÇÃO REAL!")
 
     salvar_arquivo(historico, sha)
+
 
 monitorar()
