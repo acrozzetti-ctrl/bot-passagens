@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Monitor de Passagens ✈️</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
       font-family: Arial;
@@ -67,6 +69,9 @@
 
 <div id="dados"></div>
 
+<h2>📊 Gráfico de preços</h2>
+<canvas id="grafico" width="400" height="200"></canvas>
+
 <script>
 fetch("precos.json")
   .then(res => res.json())
@@ -76,8 +81,17 @@ fetch("precos.json")
 
     let temPromocao = false;
 
+    const labels = [];
+    const valores = [];
+
     for (let rota in data) {
-      const preco = data[rota];
+      const historico = data[rota];
+      const preco = Array.isArray(historico)
+        ? historico[historico.length - 1]
+        : historico;
+
+      labels.push(rota);
+      valores.push(preco);
 
       let limite = 3000;
       if (rota.includes("MIA-GRU")) limite = 3200;
@@ -102,7 +116,21 @@ fetch("precos.json")
 
     if (temPromocao) {
       alerta.style.display = "block";
+      alert("🔥 TEM PROMOÇÃO! Corre ver!");
     }
+
+    const ctx = document.getElementById('grafico').getContext('2d');
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Preço (R$)',
+          data: valores
+        }]
+      }
+    });
   });
 </script>
 
