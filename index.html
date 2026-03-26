@@ -5,7 +5,6 @@
   <title>Monitor de Passagens ✈️</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <link rel="manifest" href="manifest.json">
 
   <style>
@@ -35,7 +34,7 @@
       background: #1e293b;
       margin: 20px auto;
       padding: 20px;
-      width: 300px;
+      width: 320px;
       border-radius: 15px;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
@@ -61,10 +60,13 @@
 
     button {
       margin-top: 10px;
-      padding: 8px;
+      padding: 10px;
       border-radius: 8px;
       border: none;
       cursor: pointer;
+      background: #22c55e;
+      color: black;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -96,6 +98,11 @@ fetch("precos.json")
       const historico = Array.isArray(data[rota]) ? data[rota] : [data[rota]];
       const preco = historico[historico.length - 1];
 
+      const partes = rota.split("-");
+      const origem = partes[0];
+      const destino = partes[1];
+      const dataVoo = partes[2];
+
       let limite = 3000;
       if (rota.includes("MIA-GRU")) limite = 3200;
       if (rota.includes("JFK-MIA")) limite = 800;
@@ -106,13 +113,15 @@ fetch("precos.json")
       container.innerHTML += `
         <div class="card ${barato ? "promo-card" : ""}">
           <h3>${rota}</h3>
+
           <div class="preco ${barato ? "barato" : "caro"}">
             R$ ${preco}
           </div>
+
           <div>${barato ? "🔥 PROMOÇÃO!" : "😬 Ainda caro"}</div>
 
-          <a href="https://www.google.com/travel/flights?q=${rota}" target="_blank">
-            <button>🔎 Ver voo real</button>
+          <a href="https://www.google.com/travel/flights?hl=pt-BR&curr=BRL&tfu=EgIIAQ&q=Flights%20from%20${origem}%20to%20${destino}%20on%20${dataVoo}" target="_blank">
+            <button>✈️ Ver voo (só ida)</button>
           </a>
         </div>
       `;
