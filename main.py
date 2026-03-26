@@ -78,9 +78,9 @@ def monitorar():
             if preco < antigo:
                 print("🔥 BAIXOU DE PREÇO!")
             
-            if preco < limite:
-                print("🚨 PROMOÇÃO REAL!")
-
+           if preco < limite:
+    print("🚨 PROMOÇÃO REAL!")
+    enviar_email(f"Promoção! {origem} → {destino} por R$ {preco}")
         novos_dados[chave] = preco
 
     salvar_arquivo(novos_dados, sha)
