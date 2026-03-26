@@ -1,5 +1,3 @@
-print("TOKEN:", TOKEN)
-print("REPO:", REPO)
 import json
 import requests
 import base64
@@ -15,7 +13,8 @@ ROTAS = [
 REPO = os.getenv("GITHUB_REPOSITORY")
 TOKEN = os.getenv("GITHUB_TOKEN")
 ARQUIVO = "precos.json"
-
+print("TOKEN:", TOKEN)
+print("REPO:", REPO)
 def pegar_arquivo():
     url = f"https://api.github.com/repos/{REPO}/contents/{ARQUIVO}"
     headers = {"Authorization": f"token {TOKEN}"}
