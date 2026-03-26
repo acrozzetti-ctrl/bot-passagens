@@ -5,16 +5,15 @@ import os
 import random
 
 ROTAS = [
-    ("GRU", "JFK", "2026-12-13", 3500),
+    ("GRU", "JFK", "2026-12-13", 3000),
     ("JFK", "MIA", "2026-12-22", 800),
-    ("MIA", "GRU", "2027-01-10", 3500)
+    ("MIA", "GRU", "2027-01-10", 3200)
 ]
 
 REPO = os.getenv("GITHUB_REPOSITORY")
 TOKEN = os.getenv("GITHUB_TOKEN")
 ARQUIVO = "precos.json"
-print("TOKEN:", TOKEN)
-print("REPO:", REPO)
+
 def pegar_arquivo():
     url = f"https://api.github.com/repos/{REPO}/contents/{ARQUIVO}"
     headers = {"Authorization": f"token {TOKEN}"}
@@ -45,7 +44,6 @@ def salvar_arquivo(dados, sha):
     r = requests.put(url, headers=headers, json=body)
 
     print("STATUS SALVAR:", r.status_code)
-    print(r.text)
 
 def buscar_preco_realista(origem, destino):
     base = {
@@ -61,29 +59,23 @@ def buscar_preco_realista(origem, destino):
 
 def monitorar():
     historico, sha = pegar_arquivo()
-    novos_dados = {}
 
     for origem, destino, data, limite in ROTAS:
         chave = f"{origem}-{destino}-{data}"
         
         preco = buscar_preco_realista(origem, destino)
-        antigo = historico.get(chave)
+
+        if chave not in historico:
+            historico[chave] = []
+
+        historico[chave].append(preco)
 
         print(f"\n🔍 {origem} → {destino} | {data}")
         print(f"💰 Atual: R$ {preco}")
 
-        if antigo:
-            print(f"📉 Antes: R$ {antigo}")
+        if preco < limite:
+            print("🔥 PROMOÇÃO REAL!")
 
-            if preco < antigo:
-                print("🔥 BAIXOU DE PREÇO!")
-            
-           if preco < limite:
-    print("🚨 PROMOÇÃO REAL!")
-    enviar_email(f"Promoção! {origem} → {destino} por R$ {preco}")
-        novos_dados[chave] = preco
+    salvar_arquivo(historico, sha)
 
-    salvar_arquivo(novos_dados, sha)
-
-# 🚀 ESSENCIAL
 monitorar()
