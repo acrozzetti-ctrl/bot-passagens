@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>✈️ Monitor de Passagens</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+        }
+        .card {
+            background: #1e293b;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 15px;
+        }
+        .promo {
+            color: #22c55e;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>✈️ Monitor de Passagens</h1>
+
+<div id="voos"></div>
+
+<script>
+fetch("precos.json")
+.then(r => r.json())
+.then(data => {
+    let html = "";
+
+    for (let rota in data) {
+        let preco = data[rota];
+
+        html += `
+        <div class="card">
+            <h2>${rota}</h2>
+            <p>💰 R$ ${preco}</p>
+            ${preco < 3000 ? "<p class='promo'>🔥 PROMOÇÃO</p>" : ""}
+        </div>`;
+    }
+
+    document.getElementById("voos").innerHTML = html;
+});
+</script>
+
+</body>
+</html>
