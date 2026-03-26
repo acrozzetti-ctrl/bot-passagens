@@ -1,3 +1,5 @@
+print("TOKEN:", TOKEN)
+print("REPO:", REPO)
 import json
 import requests
 import base64
