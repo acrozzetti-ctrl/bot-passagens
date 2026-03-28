@@ -44,6 +44,12 @@
       "companhia": "Sem dados",
       "saida": "-",
       "chegada": "-"
+    },
+    {
+      "preco": null,
+      "companhia": "Sem dados",
+      "saida": "-",
+      "chegada": "-"
     }
   ],
   "JFK-MIA-15/05/2026": [
@@ -52,9 +58,21 @@
       "companhia": "Sem dados",
       "saida": "-",
       "chegada": "-"
+    },
+    {
+      "preco": null,
+      "companhia": "Sem dados",
+      "saida": "-",
+      "chegada": "-"
     }
   ],
   "MIA-GRU-20/05/2026": [
+    {
+      "preco": null,
+      "companhia": "Sem dados",
+      "saida": "-",
+      "chegada": "-"
+    },
     {
       "preco": null,
       "companhia": "Sem dados",
