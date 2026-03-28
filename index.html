@@ -1,86 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Monitor de Passagens ✈️</title>
+<meta charset="UTF-8">
+<title>Monitor de Passagens ✈️</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-    }
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
 
-    .card {
-      background: #1e293b;
-      margin: 20px auto;
-      padding: 20px;
-      width: 340px;
-      border-radius: 15px;
-    }
+.card {
+  background: #1e293b;
+  margin: 20px auto;
+  padding: 20px;
+  width: 340px;
+  border-radius: 15px;
+}
 
-    .preco {
-      font-size: 28px;
-    }
+.preco {
+  font-size: 28px;
+}
 
-    .barato { color: #22c55e; }
-    .caro { color: #ef4444; }
+.barato { color: #22c55e; }
+.caro { color: #ef4444; }
 
-    .info {
-      font-size: 14px;
-      margin-top: 5px;
-      color: #cbd5f5;
-    }
-  </style>
+.info {
+  font-size: 14px;
+  margin-top: 5px;
+  color: #cbd5f5;
+}
+</style>
 </head>
 
 <body>
 
 <h1>✈️ Monitor de Passagens</h1>
-
 <div id="dados"></div>
 
 <script>
 fetch("precos.json")
-  .then(res => res.json())
-  .then(data => {
+.then(res => res.json())
+.then(data => {
 
-    const container = document.getElementById("dados");
+  const container = document.getElementById("dados");
 
-    for (let rota in data) {
+  for (let rota in data) {
 
-      const historico = data[rota];
+    const historico = data[rota];
+    if (!historico.length) continue;
 
-      if (!historico || historico.length === 0) continue;
+    const ultimo = historico[historico.length - 1];
 
-      const ultimo = historico.at(-1);
+    const preco = ultimo?.preco ?? "N/A";
+    const companhia = ultimo?.companhia ?? "N/A";
+    const saida = ultimo?.saida ?? "-";
+    const chegada = ultimo?.chegada ?? "-";
 
-      const preco = ultimo?.preco ?? "N/A";
-      const companhia = ultimo?.companhia ?? "Não disponível";
-      const saida = ultimo?.saida ?? "-";
-      const chegada = ultimo?.chegada ?? "-";
+    const barato = preco !== "N/A" && preco < 3000;
 
-      const barato = preco !== "N/A" && preco < 3000;
+    container.innerHTML += `
+      <div class="card">
+        <h3>${rota}</h3>
 
-      container.innerHTML += `
-        <div class="card">
-          <h3>${rota}</h3>
-
-          <div class="preco ${barato ? "barato" : "caro"}">
-            R$ ${preco}
-          </div>
-
-          <div class="info">✈️ ${companhia}</div>
-          <div class="info">🛫 Saída: ${saida}</div>
-          <div class="info">🛬 Chegada: ${chegada}</div>
-
-          <div class="info">(dados da API)</div>
+        <div class="preco ${barato ? "barato" : "caro"}">
+          R$ ${preco}
         </div>
-      `;
-    }
 
-  });
+        <div class="info">✈️ ${companhia}</div>
+        <div class="info">🛫 ${saida}</div>
+        <div class="info">🛬 ${chegada}</div>
+
+      </div>
+    `;
+  }
+
+});
 </script>
 
 </body>
