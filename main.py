@@ -2,6 +2,7 @@ import requests
 import json
 import base64
 import os
+import time
 
 TOKEN = os.getenv("GITHUB_TOKEN")
 REPO = os.getenv("GITHUB_REPOSITORY")
@@ -10,6 +11,7 @@ ARQUIVO = "precos.json"
 API_KEY = os.getenv("RAPIDAPI_KEY")
 
 print("🔑 API KEY:", "OK" if API_KEY else "ERRO")
+print("📦 REPO:", REPO)
 
 HEADERS = {
     "x-rapidapi-host": "google-flights-data.p.rapidapi.com",
@@ -65,7 +67,7 @@ def buscar_voo(origem, destino):
         }
 
     except Exception as e:
-        print("Erro:", e)
+        print("❌ ERRO:", e)
         print(r.text)
         return None
 
@@ -85,6 +87,7 @@ def carregar_arquivo():
         dados = json.loads(base64.b64decode(conteudo["content"]).decode())
         return dados, conteudo["sha"]
     else:
+        print("📁 Criando novo JSON")
         return {}, None
 
 
@@ -134,6 +137,8 @@ def monitorar():
                 "saida": "-",
                 "chegada": "-"
             })
+
+        time.sleep(5)  # 🔥 evita erro 429
 
     salvar_arquivo(historico, sha)
 
