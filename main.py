@@ -3,75 +3,73 @@ import json
 import base64
 import os
 
-# ======================
-# CONFIG
-# ======================
 TOKEN = os.getenv("GITHUB_TOKEN")
 REPO = os.getenv("GITHUB_REPOSITORY")
 ARQUIVO = "precos.json"
 
-API_KEY = os.getenv("TEQUILA_API_KEY")
+API_KEY = os.getenv("RAPIDAPI_KEY")
 
-print("🔑 API KEY:", "OK" if API_KEY else "ERRO - NÃO ENCONTRADA")
-print("📦 REPO:", REPO)
+print("🔑 API KEY:", "OK" if API_KEY else "ERRO")
+
+HEADERS = {
+    "x-rapidapi-host": "google-flights-data.p.rapidapi.com",
+    "x-rapidapi-key": API_KEY
+}
 
 ROTAS = [
-    ("GRU", "JFK", "10/05/2026"),
-    ("JFK", "MIA", "15/05/2026"),
-    ("MIA", "GRU", "20/05/2026")
+    ("JFK", "LHR"),
+    ("JFK", "MIA"),
+    ("MIA", "GRU")
 ]
 
-# ======================
-# BUSCAR VOO
-# ======================
-def buscar_voo(origem, destino, data):
-    url = "https://api.tequila.kiwi.com/v2/search"
-
-    headers = {
-        "apikey": API_KEY
-    }
+def buscar_voo(origem, destino):
+    url = "https://google-flights-data.p.rapidapi.com/flights/search-oneway"
 
     params = {
-        "fly_from": origem,
-        "fly_to": destino,
-        "date_from": data,
-        "date_to": data,
-        "curr": "BRL",
-        "limit": 1,
-        "sort": "price"
+        "departureId": origem,
+        "arrivalId": destino
     }
 
-    r = requests.get(url, headers=headers, params=params)
+    r = requests.get(url, headers=HEADERS, params=params)
 
     print(f"🌐 STATUS API ({origem}-{destino}):", r.status_code)
 
     try:
         data = r.json()
 
-        if not data.get("data"):
-            print("⚠️ Nenhum voo encontrado")
+        itinerarios = data.get("data", {}).get("itineraries", [])
+
+        if not itinerarios:
             return None
 
-        voo = data["data"][0]
+        voo = itinerarios[0]
 
-        resultado = {
-            "preco": voo.get("price"),
-            "companhia": voo.get("airlines", ["-"])[0],
-            "saida": voo.get("local_departure", "-"),
-            "chegada": voo.get("local_arrival", "-")
+        preco = voo.get("price", {}).get("raw")
+
+        leg = voo.get("legs", [{}])[0]
+
+        companhia = (
+            leg.get("carriers", {})
+               .get("marketing", [{}])[0]
+               .get("name", "N/A")
+        )
+
+        saida = leg.get("departure", "-")
+        chegada = leg.get("arrival", "-")
+
+        return {
+            "preco": preco,
+            "companhia": companhia,
+            "saida": saida,
+            "chegada": chegada
         }
 
-        return resultado
-
     except Exception as e:
-        print("❌ ERRO API:", e)
+        print("Erro:", e)
         print(r.text)
         return None
 
 
-# ======================
-# CARREGAR JSON
-# ======================
 def carregar_arquivo():
     url = f"https://api.github.com/repos/{REPO}/contents/{ARQUIVO}"
 
@@ -87,13 +85,9 @@ def carregar_arquivo():
         dados = json.loads(base64.b64decode(conteudo["content"]).decode())
         return dados, conteudo["sha"]
     else:
-        print("📁 Criando novo arquivo JSON")
         return {}, None
 
 
-# ======================
-# SALVAR JSON
-# ======================
 def salvar_arquivo(dados, sha):
     url = f"https://api.github.com/repos/{REPO}/contents/{ARQUIVO}"
 
@@ -105,7 +99,7 @@ def salvar_arquivo(dados, sha):
     conteudo = base64.b64encode(json.dumps(dados, indent=2).encode()).decode()
 
     body = {
-        "message": "Atualizando voos reais (Kiwi)",
+        "message": "Atualizando voos RapidAPI",
         "content": conteudo
     }
 
@@ -114,21 +108,18 @@ def salvar_arquivo(dados, sha):
 
     r = requests.put(url, headers=headers, json=body)
 
-    print("💾 SALVAR STATUS:", r.status_code)
+    print("💾 STATUS SALVAR:", r.status_code)
 
 
-# ======================
-# MAIN
-# ======================
 def monitorar():
     historico, sha = carregar_arquivo()
 
-    for origem, destino, data in ROTAS:
-        chave = f"{origem}-{destino}-{data}"
+    for origem, destino in ROTAS:
+        chave = f"{origem}-{destino}"
 
-        print(f"\n🔍 {origem} → {destino} | {data}")
+        print(f"\n🔍 {origem} → {destino}")
 
-        voo = buscar_voo(origem, destino, data)
+        voo = buscar_voo(origem, destino)
 
         if chave not in historico:
             historico[chave] = []
