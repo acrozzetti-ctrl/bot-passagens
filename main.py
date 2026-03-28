@@ -19,7 +19,7 @@ def buscar_voo(origem, destino, data):
     url = "https://api.tequila.kiwi.com/v2/search"
 
     headers = {
-        "apikey": API_KEY
+        "apikey": RAPIDAPI_KEY
     }
 
     params = {
