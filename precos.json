@@ -37,5 +37,29 @@
     3220,
     2691,
     2511
+  ],
+  "GRU-JFK-10/05/2026": [
+    {
+      "preco": null,
+      "companhia": "Sem dados",
+      "saida": "-",
+      "chegada": "-"
+    }
+  ],
+  "JFK-MIA-15/05/2026": [
+    {
+      "preco": null,
+      "companhia": "Sem dados",
+      "saida": "-",
+      "chegada": "-"
+    }
+  ],
+  "MIA-GRU-20/05/2026": [
+    {
+      "preco": null,
+      "companhia": "Sem dados",
+      "saida": "-",
+      "chegada": "-"
+    }
   ]
 }
