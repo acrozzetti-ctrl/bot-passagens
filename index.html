@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <title>Monitor de Passagens ✈️</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
     body {
       font-family: Arial;
@@ -26,14 +24,14 @@
       font-size: 28px;
     }
 
-    .info {
-      margin-top: 8px;
-      font-size: 14px;
-      color: #cbd5f5;
-    }
-
     .barato { color: #22c55e; }
     .caro { color: #ef4444; }
+
+    .info {
+      font-size: 14px;
+      margin-top: 5px;
+      color: #cbd5f5;
+    }
   </style>
 </head>
 
@@ -53,14 +51,17 @@ fetch("precos.json")
     for (let rota in data) {
 
       const historico = data[rota];
+
+      if (!historico || historico.length === 0) continue;
+
       const ultimo = historico.at(-1);
 
-      const preco = ultimo.preco;
-      const companhia = ultimo.companhia;
-      const saida = ultimo.saida;
-      const chegada = ultimo.chegada;
+      const preco = ultimo?.preco ?? "N/A";
+      const companhia = ultimo?.companhia ?? "Não disponível";
+      const saida = ultimo?.saida ?? "-";
+      const chegada = ultimo?.chegada ?? "-";
 
-      const barato = preco < 3000;
+      const barato = preco !== "N/A" && preco < 3000;
 
       container.innerHTML += `
         <div class="card">
@@ -74,7 +75,7 @@ fetch("precos.json")
           <div class="info">🛫 Saída: ${saida}</div>
           <div class="info">🛬 Chegada: ${chegada}</div>
 
-          <div class="info">(valor estimado pela API)</div>
+          <div class="info">(dados da API)</div>
         </div>
       `;
     }
