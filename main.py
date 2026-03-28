@@ -20,9 +20,10 @@ ROTAS = [
     ("MIA", "GRU", "2027-01-10")
 ]
 
-def buscar_preco(origem, destino):
+
+def buscar_voo(origem, destino):
     url = "https://google-flights-data.p.rapidapi.com/flights/search-oneway"
-    
+
     params = {
         "departureId": origem,
         "arrivalId": destino
@@ -32,10 +33,24 @@ def buscar_preco(origem, destino):
     data = r.json()
 
     try:
-        preco = data["data"]["itineraries"][0]["price"]["raw"]
-        return int(preco)
+        voo = data["data"]["itineraries"][0]
+
+        preco = int(voo["price"]["raw"])
+        companhia = voo["legs"][0]["carriers"]["marketing"][0]["name"]
+
+        # ⏰ horários
+        saida = voo["legs"][0]["departure"]
+        chegada = voo["legs"][0]["arrival"]
+
+        return {
+            "preco": preco,
+            "companhia": companhia,
+            "saida": saida,
+            "chegada": chegada
+        }
+
     except:
-        print("Erro ao pegar preço:", data)
+        print("Erro API:", data)
         return None
 
 
@@ -68,17 +83,14 @@ def salvar_arquivo(dados, sha):
     conteudo = base64.b64encode(json.dumps(dados, indent=2).encode()).decode()
 
     body = {
-        "message": "Atualizando preços com API real",
+        "message": "Atualizando preços + voos",
         "content": conteudo
     }
 
     if sha:
         body["sha"] = sha
 
-    r = requests.put(url, headers=headers, json=body)
-
-    print("STATUS SALVAR:", r.status_code)
-    print(r.text)
+    requests.put(url, headers=headers, json=body)
 
 
 def monitorar():
@@ -89,18 +101,15 @@ def monitorar():
 
         print(f"\n🔍 {origem} → {destino}")
 
-        preco = buscar_preco(origem, destino)
+        voo = buscar_voo(origem, destino)
 
-        if preco:
-            print(f"💰 Preço encontrado: R$ {preco}")
-
+        if voo:
             if chave not in historico:
                 historico[chave] = []
 
-            if isinstance(historico[chave], int):
-                historico[chave] = [historico[chave]]
+            historico[chave].append(voo)
 
-            historico[chave].append(preco)
+            print(voo)
 
     salvar_arquivo(historico, sha)
 
