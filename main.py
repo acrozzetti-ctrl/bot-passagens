@@ -20,7 +20,6 @@ ROTAS = [
     ("MIA", "GRU", "2027-01-10")
 ]
 
-
 def buscar_voo(origem, destino):
     url = "https://google-flights-data.p.rapidapi.com/flights/search-oneway"
 
@@ -29,18 +28,36 @@ def buscar_voo(origem, destino):
         "arrivalId": destino
     }
 
-    r = requests.get(url, headers=HEADERS, params=params)
-    data = r.json()
-
     try:
-        voo = data["data"]["itineraries"][0]
+        r = requests.get(url, headers=HEADERS, params=params)
+        data = r.json()
 
-        preco = int(voo["price"]["raw"])
-        companhia = voo["legs"][0]["carriers"]["marketing"][0]["name"]
+        # DEBUG (pode tirar depois)
+        print(json.dumps(data, indent=2))
 
-        # ⏰ horários
-        saida = voo["legs"][0]["departure"]
-        chegada = voo["legs"][0]["arrival"]
+        itinerarios = data.get("data", {}).get("itineraries", [])
+
+        if not itinerarios:
+            return None
+
+        voo = itinerarios[0]
+
+        preco = voo.get("price", {}).get("raw")
+
+        legs = voo.get("legs", [])
+        if not legs:
+            return None
+
+        leg = legs[0]
+
+        companhia = (
+            leg.get("carriers", {})
+               .get("marketing", [{}])[0]
+               .get("name", "Não informado")
+        )
+
+        saida = leg.get("departure", "-")
+        chegada = leg.get("arrival", "-")
 
         return {
             "preco": preco,
@@ -49,8 +66,8 @@ def buscar_voo(origem, destino):
             "chegada": chegada
         }
 
-    except:
-        print("Erro API:", data)
+    except Exception as e:
+        print("Erro:", e)
         return None
 
 
@@ -83,14 +100,16 @@ def salvar_arquivo(dados, sha):
     conteudo = base64.b64encode(json.dumps(dados, indent=2).encode()).decode()
 
     body = {
-        "message": "Atualizando preços + voos",
+        "message": "Atualizando voos (seguro)",
         "content": conteudo
     }
 
     if sha:
         body["sha"] = sha
 
-    requests.put(url, headers=headers, json=body)
+    r = requests.put(url, headers=headers, json=body)
+
+    print("STATUS:", r.status_code)
 
 
 def monitorar():
@@ -103,13 +122,15 @@ def monitorar():
 
         voo = buscar_voo(origem, destino)
 
-        if voo:
+        if voo and voo["preco"]:
             if chave not in historico:
                 historico[chave] = []
 
             historico[chave].append(voo)
 
-            print(voo)
+            print("✅ OK:", voo)
+        else:
+            print("⚠️ Sem dados dessa rota")
 
     salvar_arquivo(historico, sha)
 
