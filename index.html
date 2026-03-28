@@ -7,29 +7,35 @@
 <style>
 body {
   font-family: Arial;
-  background: #0f172a;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
   color: white;
   text-align: center;
+}
+
+h1 {
+  margin-top: 30px;
 }
 
 .card {
   background: #1e293b;
   margin: 20px auto;
   padding: 20px;
-  width: 340px;
-  border-radius: 15px;
+  width: 350px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
 .preco {
-  font-size: 28px;
+  font-size: 30px;
+  font-weight: bold;
 }
 
 .barato { color: #22c55e; }
 .caro { color: #ef4444; }
 
 .info {
-  font-size: 14px;
   margin-top: 5px;
+  font-size: 14px;
   color: #cbd5f5;
 }
 </style>
@@ -54,12 +60,15 @@ fetch("precos.json")
 
     const ultimo = historico[historico.length - 1];
 
-    const preco = ultimo?.preco ?? "N/A";
-    const companhia = ultimo?.companhia ?? "N/A";
-    const saida = ultimo?.saida ?? "-";
-    const chegada = ultimo?.chegada ?? "-";
+    let preco = ultimo?.preco;
+    let companhia = ultimo?.companhia;
+    let saida = ultimo?.saida;
+    let chegada = ultimo?.chegada;
 
-    const barato = preco !== "N/A" && preco < 3000;
+    if (!preco) preco = "Indisponível";
+    if (!companhia) companhia = "Sem dados";
+
+    const barato = preco !== "Indisponível" && preco < 3000;
 
     container.innerHTML += `
       <div class="card">
